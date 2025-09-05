@@ -9,6 +9,17 @@ export default function Home() {
       <p className="text-lg text-center">
         This is a simple Next.js application.
       </p>
+      <h1 className="text-4xl font-bold text-center">now learn next auth</h1>
+      <p className="text-lg text-center">
+        NextAuth.js is a complete open-source authentication solution for Next.js applications.
+      </p>
+      <p className="text-lg text-center">
+        It provides a simple way to add authentication to your Next.js app.
+      </p>
+      <p className="text-lg text-center">
+        With NextAuth.js, you can easily integrate various authentication providers and manage user sessions.
+      </p>
+
     </div>
   );
 }
