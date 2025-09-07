@@ -1,0 +1,109 @@
+"use client"
+
+import * as React from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { useRouter } from "next/navigation"
+
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import LoadingButton from "@/components/ui/loading-button"
+import { signInSchema } from "@/lib/zod"
+import { handleCredentialsSignIn } from "@/app/actions/authAction"
+import ErrorMsg from "@/components/ui/error-msg"
+
+export default function SignInForm() {
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { email: "", password: "" },
+  })
+  
+  const router = useRouter()
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [globalError, setGlobalError] = React.useState<string | null>(null)
+
+  const onSubmit = async (values: z.infer<typeof signInSchema>) => {
+    setIsLoading(true)
+    setGlobalError(null)
+    
+    try {
+      await handleCredentialsSignIn(values.email, values.password)
+      // If we reach here without redirect, something went wrong
+      setGlobalError("Sign in failed. Please try again.")
+    } catch (error) {
+      // Handle redirect errors (which are expected on successful sign-in)
+      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+        // This is expected - the server action redirected successfully
+        return
+      }
+      
+      setGlobalError((error as Error).message)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
+      <Card className="w-full max-w-md shadow-2xl rounded-2xl backdrop-blur-md bg-white/90">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold text-gray-800">
+            Sign In to your account
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {globalError && <ErrorMsg error={globalError} />}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="you@example.com"
+                        type="email"
+                        {...field}
+                        className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-sm" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-700">Password</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="••••••••"
+                        type="password"
+                        {...field}
+                        className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500 text-sm" />
+                  </FormItem>
+                )}
+              />
+              <LoadingButton pending={isLoading} />
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-2 text-sm text-gray-600 justify-center">
+          <p className="text-center">
+            Don't have an account?{" "}
+            <span className="text-indigo-600 hover:underline cursor-pointer">Sign Up</span>
+          </p>
+        </CardFooter>
+      </Card>
+    </div>
+  )
+}
