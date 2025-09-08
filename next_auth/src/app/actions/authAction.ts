@@ -1,7 +1,7 @@
 // src/app/actions/authAction.ts
-"use server"
-import { signIn, signOut } from "@/auth"
-import { AuthError } from "next-auth"
+"use server";
+import { signIn, signOut } from "@/auth";
+import { AuthError } from "next-auth";
 
 export async function handleCredentialsSignIn(email: string, password: string) {
   try {
@@ -9,28 +9,32 @@ export async function handleCredentialsSignIn(email: string, password: string) {
       email,
       password,
       redirectTo: "/dashboard", // Let NextAuth handle the redirect
-    })
+    });
   } catch (error) {
     // NEXT_REDIRECT is expected for successful redirects
-    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
-      throw error // Re-throw (this is success)
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error; // Re-throw (this is success)
     }
-    
+
     if (error instanceof AuthError) {
       switch (error.type) {
-        case 'CredentialsSignin':
-          throw new Error('Invalid email or password')
+        case "CredentialsSignin":
+          throw new Error("Invalid email or password");
         default:
-          throw new Error('Authentication failed')
+          throw new Error("Authentication failed");
       }
     }
-    
-    throw new Error(error instanceof Error ? error.message : 'Sign in failed')
+
+    throw new Error(error instanceof Error ? error.message : "Sign in failed");
   }
 }
 
 export async function handleSignOut() {
   await signOut({
-    redirectTo: "/auth/signin"
-  })
+    redirectTo: "/auth/signin",
+  });
+}
+
+export async function handleGithubSignIn() {
+  await signIn("github");
 }

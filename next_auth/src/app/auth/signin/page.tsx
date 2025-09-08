@@ -1,49 +1,66 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useRouter } from "next/navigation"
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useRouter } from "next/navigation";
 
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import LoadingButton from "@/components/ui/loading-button"
-import { signInSchema } from "@/lib/zod"
-import { handleCredentialsSignIn } from "@/app/actions/authAction"
-import ErrorMsg from "@/components/ui/error-msg"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import LoadingButton from "@/components/ui/loading-button";
+import { signInSchema } from "@/lib/zod";
+import {
+  handleCredentialsSignIn,
+  handleGithubSignIn,
+} from "@/app/actions/authAction";
+import ErrorMsg from "@/components/ui/error-msg";
+import { Button } from "@/components/ui/button";
 
 export default function SignInForm() {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "" },
-  })
-  
-  const router = useRouter()
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [globalError, setGlobalError] = React.useState<string | null>(null)
+  });
+
+  const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [globalError, setGlobalError] = React.useState<string | null>(null);
 
   const onSubmit = async (values: z.infer<typeof signInSchema>) => {
-    setIsLoading(true)
-    setGlobalError(null)
-    
+    setIsLoading(true);
+    setGlobalError(null);
+
     try {
-      await handleCredentialsSignIn(values.email, values.password)
+      await handleCredentialsSignIn(values.email, values.password);
       // If we reach here without redirect, something went wrong
-      setGlobalError("Sign in failed. Please try again.")
+      setGlobalError("Sign in failed. Please try again.");
     } catch (error) {
       // Handle redirect errors (which are expected on successful sign-in)
-      if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
         // This is expected - the server action redirected successfully
-        return
+        return;
       }
-      
-      setGlobalError((error as Error).message)
+
+      setGlobalError((error as Error).message);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-4">
@@ -96,14 +113,34 @@ export default function SignInForm() {
               <LoadingButton pending={isLoading} />
             </form>
           </Form>
+          <div className="text-sm text-gray-600 text-center p-2">or</div>
+          <div className="flex flex-col space-y-2">
+            <Button
+              type="submit"
+              variant={"default"}
+              className="w-full rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+              onClick={() => handleGithubSignIn()}
+            >
+              Sign In with Github
+            </Button>
+            <Button
+              type="submit"
+              variant={"default"}
+              className="w-full rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              Sign In with Google
+            </Button>
+          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2 text-sm text-gray-600 justify-center">
           <p className="text-center">
             Don't have an account?{" "}
-            <span className="text-indigo-600 hover:underline cursor-pointer">Sign Up</span>
+            <span className="text-indigo-600 hover:underline cursor-pointer">
+              Sign Up
+            </span>
           </p>
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }
