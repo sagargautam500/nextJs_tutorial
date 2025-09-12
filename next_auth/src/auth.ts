@@ -5,7 +5,7 @@ import GitHub from "next-auth/providers/github";
 import { signInSchema } from "./lib/zod";
 
 // Main NextAuth config
-export  const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     // GitHub OAuth Provider
     GitHub({
@@ -16,8 +16,16 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
     // Credentials (email + password)
     Credentials({
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "enter your email" },
-        password: { label: "Password", type: "password", placeholder: "enter password" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "enter your email",
+        },
+        password: {
+          label: "Password",
+          type: "password",
+          placeholder: "enter password",
+        },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -34,12 +42,13 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
         //   name: "Sagar Gautam",
         //   email: "sagar.gautam@example.com",
         // };
-        const user={
-          id:"89",
-          name:parsed.data.email,     //Valid credentials"
-          email:parsed.data.email,
-          password:parsed.data.password
-        }
+        const user = {
+          id: "89",
+          name: parsed.data.email, //Valid credentials"
+          email: parsed.data.email,
+          password: parsed.data.password,
+          role: "admin",
+        };
 
         return user; // returned to jwt callback
       },
@@ -48,7 +57,7 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
 
   // 🔑 Session & JWT config
   session: {
-    strategy: "jwt",          // use JWT-based sessions
+    strategy: "jwt", // use JWT-based sessions
     maxAge: 60 * 60 * 24 * 1, // 1 days
   },
 
@@ -62,8 +71,9 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
+        token.role = user.role;
+        // token.name = user.name;     //not need to, id and password only declare if need
+        // token.email = user.email;
       }
       return token;
     },
@@ -71,19 +81,20 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
     // Expose token fields to session
     async session({ session, token }) {
       session.user.id = token.id as string;
-      session.user.name = token.name as string;
-      session.user.email = token.email as string;
-      // console.log("Session callback:", session);
+      session.user.role = token.role as string;
+      // session.user.name = token.name as string;
+      // session.user.email = token.email as string;
       return session;
     },
 
     // Route protection
     authorized({ request: { nextUrl }, auth }) {
       const isLoggedIn = !!auth?.user;
-      const { pathname } = nextUrl;
+      const pathname = nextUrl.pathname.replace(/\/$/, ""); // remove trailing slash
+      const role = auth?.user?.role;
 
       // 🚫 If logged in → block sign-in page
-      if (pathname.startsWith("/auth/signin") && isLoggedIn) {
+      if (pathname === "/auth/signin" && isLoggedIn) {
         return Response.redirect(new URL("/", nextUrl));
       }
 
@@ -92,7 +103,32 @@ export  const { handlers, signIn, signOut, auth } = NextAuth({
         return Response.redirect(new URL("/auth/signin", nextUrl));
       }
 
-      return true; // allow everything else
+      // 🔒 Protect about page
+      if (pathname.startsWith("/about") && !isLoggedIn) {
+        return Response.redirect(new URL("/auth/signin", nextUrl));
+      }
+
+      // 🔒 Protect admin page (only for admins)
+      if (pathname.startsWith("/admin")) {
+        if (!isLoggedIn) {
+          return Response.redirect(new URL("/auth/signin", nextUrl));
+        }
+        if (role !== "admin") {
+          return Response.redirect(new URL("/", nextUrl));
+        }
+      }
+
+      // 🔒 Protect user page (only for users)
+      if (pathname.startsWith("/user")) {
+        if (!isLoggedIn) {
+          return Response.redirect(new URL("/auth/signin", nextUrl));
+        }
+        if (role !== "user") {
+          return Response.redirect(new URL("/", nextUrl));
+        }
+      }
+
+      return true; // ✅ allow everything else
     },
   },
 

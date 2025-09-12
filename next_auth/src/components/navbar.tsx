@@ -8,6 +8,7 @@ export default async function Navbar() {
   //if client side session
   // const session = useSession();
   const session = await auth(); // server-side session
+  // console.log("session ",session)
 
   return (
     <nav className="sticky top-0 z-50 bg-gray-600 shadow-md">
@@ -20,14 +21,40 @@ export default async function Navbar() {
           >
             Auth.js
           </Link>
-
           {session && (
-            <Link
-              href="/dashboard"
-              className="font-medium text-gray-300 hover:text-white transition"
-            >
-              Dashboard
-            </Link>
+            <>
+              <Link
+                href="/dashboard"
+                className="font-medium text-gray-300 hover:text-white transition"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/about"
+                className="font-medium text-gray-300 hover:text-white transition"
+              >
+                About
+              </Link>
+
+
+              {session.user?.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="font-medium text-gray-300 hover:text-white transition"
+                >
+                  Admin
+                </Link>
+              )}
+
+              {session.user?.role === "user" && (
+                <Link
+                  href="/user"
+                  className="font-medium text-gray-300 hover:text-white transition"
+                >
+                  User
+                </Link>
+              )}
+            </>
           )}
         </div>
 
