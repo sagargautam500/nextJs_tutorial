@@ -30,6 +30,7 @@ import {
 } from "@/app/actions/authAction";
 import ErrorMsg from "@/components/ui/error-msg";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function SignInForm() {
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -110,7 +111,7 @@ export default function SignInForm() {
                   </FormItem>
                 )}
               />
-              <LoadingButton pending={isLoading} />
+              <LoadingButton pending={isLoading} label="Sign In" />
             </form>
           </Form>
           <div className="text-sm text-gray-600 text-center p-2">or</div>
@@ -135,9 +136,12 @@ export default function SignInForm() {
         <CardFooter className="flex flex-col space-y-2 text-sm text-gray-600 justify-center">
           <p className="text-center">
             Don't have an account?{" "}
-            <span className="text-indigo-600 hover:underline cursor-pointer">
+            <Link
+              href="/auth/signup"
+              className="text-blue-600 hover:underline font-medium"
+            >
               Sign Up
-            </span>
+            </Link>
           </p>
         </CardFooter>
       </Card>

@@ -5,9 +5,10 @@ import { Button } from "./button"
 
 interface LoadingButtonProps {
   pending: boolean
+  label?: string // optional label for button
 }
 
-export default function LoadingButton({ pending }: LoadingButtonProps) {
+export default function LoadingButton({ pending, label }: LoadingButtonProps) {
   return (
     <Button
       variant="default" // shadcn default variant
@@ -18,10 +19,10 @@ export default function LoadingButton({ pending }: LoadingButtonProps) {
       {pending ? (
         <div className="flex items-center space-x-2">
           <Loader2 className="h-5 w-5 animate-spin text-white" />
-          <span>Signing In...</span>
+          <span>{label ? `${label}...` : "Processing..."}</span>
         </div>
       ) : (
-        "Sign In"
+        label || "Submit"
       )}
     </Button>
   )
