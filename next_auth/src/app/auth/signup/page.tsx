@@ -54,18 +54,23 @@ export default function SignUpPage() {
   const hobbiesList = ["Reading", "Coding", "Sports", "Music"];
 
  const onSubmit = async (values: SignUpFormValues) => {
-  setIsLoading(true);
-  setGlobalError(null);
+    setIsLoading(true);
+    setGlobalError(null);
 
-  try {
-    await handleCredentialsSignUp(values);
-    router.push("/auth/signin"); // redirect on success
-  } catch (err: any) {
-    setGlobalError(err.message || "Signup failed");
-  } finally {
+    const result = await handleCredentialsSignUp(values);
+
+    if (result.success) {
+      // Success -> redirect to signin page
+      router.push("/auth/signin");
+    } else {
+      // Show error (like "Email already exists")
+      setGlobalError(result.message);
+    }
+
     setIsLoading(false);
-  }
-};
+  };
+
+
 
 
   return (
@@ -211,7 +216,7 @@ export default function SignUpPage() {
               />
 
               {/* Submit */}
-              <LoadingButton pending={isLoading} label="Signing Up" />
+              <LoadingButton pending={isLoading} label="Sign Up" />
             </form>
           </Form>
         </CardContent>

@@ -61,11 +61,18 @@ export default async function Navbar() {
         {/* Right side */}
         <div>
           {!session ? (
+            <>
             <Link href="/auth/signin">
               <Button className="rounded-full px-5 py-2 font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
                 Sign In
               </Button>
             </Link>
+            <Link href="/auth/signup">
+              <Button className="rounded-full ml-5 px-5 py-2 font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition">
+                Sign Up
+              </Button>
+            </Link>
+            </>
           ) : (
             <form action={handleSignOut} className="inline-block">
               <Button

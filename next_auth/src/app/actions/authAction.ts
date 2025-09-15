@@ -5,8 +5,6 @@ import { db } from "@/lib/prisma";
 import { AuthError } from "next-auth";
 import bcrypt from "bcrypt";
 
-
-
 interface ValuesProps {
   name: string;
   email: string;
@@ -19,7 +17,6 @@ interface ValuesProps {
 
 export async function handleCredentialsSignUp(values: ValuesProps) {
   try {
-    // Hash the password before storing
     const hashedPassword = await bcrypt.hash(values.password, 10);
 
     const user = await db.user.create({
@@ -33,15 +30,19 @@ export async function handleCredentialsSignUp(values: ValuesProps) {
       },
     });
 
-    return user; // return created user if needed
+    return { success: true, user };
   } catch (err: any) {
-    // Handle unique constraint error (duplicate email)
+    // Prisma duplicate email error
     if (err.code === "P2002" && err.meta?.target?.includes("email")) {
-      throw new Error("Email already exists");
+      return { success: false, message: "Email already exists" };
     }
-    throw new Error(err.message || "Failed to create user");
+
+    // Any other errors
+    return { success: false, message: err.message || "Signup failed" };
   }
 }
+
+
 
 export async function handleCredentialsSignIn(email: string, password: string) {
   try {
@@ -78,4 +79,3 @@ export async function handleSignOut() {
 export async function handleGithubSignIn() {
   await signIn("github");
 }
-

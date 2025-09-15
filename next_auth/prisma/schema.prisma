@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id             String   @id @map("_id") @default(auto()) @db.ObjectId
-  name           String
-  email          String   @unique
-  phone          String
-  password       String
-  hobbies        String[]
-  role           String
-  createdAt      DateTime @default(now())
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  email    String   @unique
+  phone    String
+  password String
+  role     String
+  hobbies  String[]
+  createdAt DateTime @default(now())
 }
