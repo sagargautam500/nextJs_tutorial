@@ -15,7 +15,6 @@ export const signUpSchema = z
     password: z.string().nonempty("Password is required").min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().nonempty("Confirm Password is required"),
     role: z.enum(["user", "admin"]).refine((val) => !!val, { message: "Role is required" }),
-    hobbies: z.array(z.string()).min(1, "Select at least one hobby"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ["confirmPassword"],

@@ -42,7 +42,6 @@ export default function SignUpPage() {
       phone: "",
       password: "",
       confirmPassword: "",
-      hobbies: [],
       role: "user",
     },
   });
@@ -51,7 +50,6 @@ export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
 
-  const hobbiesList = ["Reading", "Coding", "Sports", "Music"];
 
  const onSubmit = async (values: SignUpFormValues) => {
     setIsLoading(true);
@@ -158,35 +156,6 @@ export default function SignUpPage() {
                     <FormControl>
                       <Input {...field} type="password" placeholder="••••••••" className="rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"/>
                     </FormControl>
-                    <FormMessage className="text-red-500 text-sm"/>
-                  </FormItem>
-                )}
-              />
-
-              {/* Hobbies */}
-              <FormField
-                control={form.control}
-                name="hobbies"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Hobbies</FormLabel>
-                    <div className="flex flex-col space-y-2 mt-1">
-                      {hobbiesList.map((hobby) => (
-                        <div key={hobby} className="flex items-center space-x-2">
-                          <Checkbox
-                            checked={field.value.includes(hobby)}
-                            onCheckedChange={(checked) => {
-                              field.onChange(
-                                checked
-                                  ? [...field.value, hobby]
-                                  : field.value.filter((v) => v !== hobby)
-                              );
-                            }}
-                          />
-                          <span>{hobby}</span>
-                        </div>
-                      ))}
-                    </div>
                     <FormMessage className="text-red-500 text-sm"/>
                   </FormItem>
                 )}

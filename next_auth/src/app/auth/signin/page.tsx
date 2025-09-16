@@ -32,6 +32,7 @@ import ErrorMsg from "@/components/ui/error-msg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
+
 export default function SignInForm() {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -48,16 +49,12 @@ export default function SignInForm() {
 
     try {
       await handleCredentialsSignIn(values.email, values.password);
-      // If we reach here without redirect, something went wrong
-      setGlobalError("Sign in failed. Please try again.");
+      // success case never reaches here (redirect happens)
     } catch (error) {
-      // Handle redirect errors (which are expected on successful sign-in)
       if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
-        // This is expected - the server action redirected successfully
-        return;
+        return; // success → redirected
       }
-
-      setGlobalError((error as Error).message);
+      setGlobalError((error as Error).message); // show real error
     } finally {
       setIsLoading(false);
     }

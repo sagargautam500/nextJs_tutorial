@@ -1,5 +1,6 @@
-// src/middleware.ts
-export { auth as middleware } from "@/auth";
+// // src/middleware.ts
+// Use an Edge-safe auth instance that does not import Node-only modules
+export { auth as middleware } from "@/auth-edge";
 
 export const config = {
   matcher: [
