@@ -9,5 +9,6 @@ export const config = {
     "/admin/:path*",       // protect admin routes
     "/user/:path*",        // protect user routes
     "/auth/signin",        // handle redirect if already signed in
+    "/auth/signup",       // handle redirect if already signed up
   ],
 };

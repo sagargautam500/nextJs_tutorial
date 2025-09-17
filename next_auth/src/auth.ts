@@ -45,11 +45,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // const bcrypt = await import("bcrypt");
         const isValid = await bcrypt.compare(
           parsed.data.password,
-          user.password
+          user.password || ""
         );
         if (!isValid) return null;
 
-        return user;
+        return { id: user.id, email: user.email, role: user.role };
       },
     }),
   ],
@@ -58,11 +58,33 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   jwt: { maxAge: 60 * 60 * 24 },
 
   callbacks: {
+      // ✅ Auto-create user if signing in with OAuth (GitHub, Google, etc.)
+    async signIn({ user, account }) {
+      if (account?.provider !== "credentials") {
+        // Check if user already exists
+        const existingUser = await db.user.findUnique({
+          where: { email: user.email! },
+        });
+
+        if (!existingUser) {
+          await db.user.create({
+            data: {
+              name: user.name ?? "No Name",
+              email: user.email!,
+              phone: "",
+              password: "",
+              role: "user", // default role
+            },
+          });
+        }
+      }
+      return true;
+    },
     // Store user info in JWT token
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.role = user.role;
+        token.id = (user as any).id;
+        token.role = (user as any).role ?? "user";
       }
       return token;
     },
@@ -70,7 +92,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // Expose token fields to session
     async session({ session, token }) {
       session.user.id = token.id as string;
-      session.user.role = token.role as string;
+      session.user.role = (token.role as string) ?? "user";
       return session;
     },
      //autherize(route protection) handled by edge middleware (auth-edge)
