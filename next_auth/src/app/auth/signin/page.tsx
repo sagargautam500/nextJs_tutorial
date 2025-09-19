@@ -32,7 +32,6 @@ import ErrorMsg from "@/components/ui/error-msg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-
 export default function SignInForm() {
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -108,13 +107,25 @@ export default function SignInForm() {
                   </FormItem>
                 )}
               />
+
+              {/* Forgot password link (added) */}
+              <div className="flex justify-end">
+                <Link
+                  href="/auth/forgot"
+                  className="text-sm text-indigo-600 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
               <LoadingButton pending={isLoading} label="Sign In" />
             </form>
           </Form>
+
           <div className="text-sm text-gray-600 text-center p-2">or</div>
           <div className="flex flex-col space-y-2">
             <Button
-              type="submit"
+              type="button"
               variant={"default"}
               className="w-full rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
               onClick={() => handleGithubSignIn()}
@@ -122,7 +133,7 @@ export default function SignInForm() {
               Sign In with Github
             </Button>
             <Button
-              type="submit"
+              type="button"
               variant={"default"}
               className="w-full rounded-xl bg-indigo-400 hover:bg-indigo-500 text-white font-semibold py-2 transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center"
             >

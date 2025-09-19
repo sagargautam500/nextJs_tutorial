@@ -16,7 +16,7 @@ export const { auth } = NextAuth({
       const pathname = nextUrl.pathname.replace(/\/$/, "");
       const role = auth?.user?.role;
       
-      console.log("role", role);
+      // console.log("role", role);
 
       // Allow visiting auth pages when logged out. If already logged in, redirect home.
       if (pathname === "/auth/signin" && isLoggedIn)
