@@ -3,13 +3,19 @@ import { z } from "zod";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
-// Zod schema
+// Validation schema
 const signupSchema = z.object({
-  fullName: z.string().min(3, "Full name must be at least 3 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Please enter a valid email"),
+  phone: z.string().min(1, "Phone number is required"), // Add phone number validation
   password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+  role: z.enum(["user", "admin"]).optional().default("user"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
+
 
 export async function POST(req: Request) {
   try {
@@ -48,6 +54,7 @@ export async function POST(req: Request) {
         email,
         phone,
         password: hashedPassword,
+        role: "user",
       },
     });
 

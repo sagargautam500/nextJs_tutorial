@@ -1,19 +1,13 @@
 // src/components/Navbar.tsx
+import { handleSignOut } from "@/app/actions/authAction";
+import { auth } from "@/auth";
 import Link from "next/link";
 
 
 export default async function Navbar() {
-const session = {
-  user: {
-    id: "1",
-    name: "sudhanshu",
-    email: "1@1.com",
-    role: "user"
-  }
-};
+  // Simulate fetching session data
+  const session = await auth();
 
-
- 
 
   return (
     <nav className="sticky top-0 z-50 bg-gray-600 shadow-md">
@@ -79,7 +73,7 @@ const session = {
             </Link>
             </>
           ) : (
-            <form  className="inline-block">
+            <form action={handleSignOut} className="inline-block">
               <button
                 type="submit"
                 className="rounded-full px-5 py-2 font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition"
