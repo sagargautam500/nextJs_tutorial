@@ -42,3 +42,10 @@ export async function handleSignOut() {
 export async function handleGoogleSignIn() {
   await signIn("google")
 }
+export async function handleGitHubSignIn() {
+  await signIn("github")
+}
+
+export async function handleFacebookSignIn() {
+  await signIn("facebook")
+}
