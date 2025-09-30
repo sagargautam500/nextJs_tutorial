@@ -7,14 +7,14 @@ export interface CategoryProps {
   updatedAt: string;
 }
 
+// types/product.ts
 export interface ProductProps {
-  id: number;
+  id: string;
   title: string;
-  slug: string;
-  price: number;
   description: string;
-  category: CategoryProps;
+  category: { id: string; name: string };
   images: string[];
-  creationAt: string;
-  updatedAt: string;
+  priceId: string;        // stripe Price ID (server-side verified)
+  displayPrice: number;   // human-readable price like 19.99
 }
+

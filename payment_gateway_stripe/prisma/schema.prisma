@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Order {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  stripeSession String   @unique
+  customerEmail String?
+  totalAmount   Int
+  currency      String
+  status        String   // pending, paid, canceled
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId   String  @db.ObjectId
+  productId String  // Stripe Price ID
+  quantity  Int
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
