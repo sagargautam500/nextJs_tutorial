@@ -2,19 +2,29 @@
 import { NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 
+interface CheckoutRequestBody {
+  priceId: string;
+  quantity: number;
+}
+
 export async function POST(req: Request) {
   try {
-    const { priceId, quantity } = await req.json();
+    const body: CheckoutRequestBody = await req.json();
+
+    const { priceId, quantity } = body;
 
     if (!priceId || !quantity || quantity < 1) {
-      return NextResponse.json({ error: "Invalid checkout request" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid checkout request" },
+        { status: 400 }
+      );
     }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
-          price: priceId, // safer: use Stripe Price ID directly
+          price: priceId,
           quantity,
         },
       ],
@@ -24,7 +34,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ url: session.url });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    // Type-safe error handling
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal Server Error";
+
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }

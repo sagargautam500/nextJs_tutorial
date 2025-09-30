@@ -28,6 +28,11 @@ export default function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleCheckout = async () => {
+    if (!product.priceId) {
+      alert("Invalid product price.");
+      return;
+    }
+
     try {
       setLoading(true);
       const resp = await axios.post<{ url?: string; error?: string }>("/api/checkout", {
@@ -42,8 +47,10 @@ export default function ProductCard({ product }: ProductCardProps) {
       } else {
         alert("Unexpected checkout response");
       }
-    } catch (err: any) {
-      alert("Error during checkout: " + (err.message ?? err));
+    } catch (error: unknown) {
+      const errMsg =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      alert("Error during checkout: " + errMsg);
     } finally {
       setLoading(false);
     }
@@ -64,13 +71,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <button
-          onClick={() => setCurrentImage((p) => (p === 0 ? product.images.length - 1 : p - 1))}
+          onClick={() =>
+            setCurrentImage(
+              (p) => (p === 0 ? product.images.length - 1 : p - 1)
+            )
+          }
           className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 px-2 py-1 text-white hover:bg-black/70"
         >
           {"<"}
         </button>
         <button
-          onClick={() => setCurrentImage((p) => (p === product.images.length - 1 ? 0 : p + 1))}
+          onClick={() =>
+            setCurrentImage(
+              (p) => (p === product.images.length - 1 ? 0 : p + 1)
+            )
+          }
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 px-2 py-1 text-white hover:bg-black/70"
         >
           {">"}
@@ -78,10 +93,16 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="mt-4 space-y-2">
-        <h3 className="truncate text-lg font-semibold text-gray-900">{product.title}</h3>
+        <h3 className="truncate text-lg font-semibold text-gray-900">
+          {product.title}
+        </h3>
         <p className="text-sm text-gray-500">{product.category.name}</p>
-        <p className="text-xl font-bold text-blue-600">${product.displayPrice}</p>
-        <p className="line-clamp-2 text-sm text-gray-600">{product.description}</p>
+        <p className="text-xl font-bold text-blue-600">
+          ${product.displayPrice}
+        </p>
+        <p className="line-clamp-2 text-sm text-gray-600">
+          {product.description}
+        </p>
       </div>
 
       {/* Quantity selector */}
@@ -92,7 +113,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         >
           -
         </button>
-        <span className="min-w-[40px] text-center text-lg font-semibold">{quantity}</span>
+        <span className="min-w-[40px] text-center text-lg font-semibold">
+          {quantity}
+        </span>
         <button
           onClick={() => setQuantity((q) => q + 1)}
           className="rounded-full bg-gray-200 px-3 py-1 text-lg font-bold hover:bg-gray-300"

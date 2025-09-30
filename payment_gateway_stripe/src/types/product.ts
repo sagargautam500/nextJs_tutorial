@@ -1,3 +1,4 @@
+// types/product.ts
 export interface CategoryProps {
   id: number;
   name: string;
