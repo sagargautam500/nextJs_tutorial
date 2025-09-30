@@ -48,8 +48,8 @@ export default function ProductsPage() {
 
   // Filtered products
   const filteredProducts = products.filter((p) => {
-    const categoryMatch = selectedCategory ? p.category.id === selectedCategory : true;
-    const priceMatch = p.price >= priceRange[0] && p.price <= priceRange[1];
+    const categoryMatch = selectedCategory ? Number(p.category.id) === selectedCategory : true;
+    const priceMatch = p.displayPrice >= priceRange[0] && p.displayPrice <= priceRange[1];
     return categoryMatch && priceMatch;
   });
 
