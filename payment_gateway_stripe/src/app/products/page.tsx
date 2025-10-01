@@ -1,81 +1,47 @@
-"use client";
 
-import { useEffect, useState } from "react";
-import api from "@/lib/axios";
-import { ProductProps } from "@/types/product";
-import ProductCard from "@/components/ProductCard";
-import Sidebar from "@/components/Sidebar";
+import { prisma } from "@/lib/prisma";
+import { ProductProps, CategoryProps } from "@/types/product";
+import ProductsClient from "@/components/ProductClient";
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-export default function ProductsPage() {
-  const [products, setProducts] = useState<ProductProps[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch products
-  const fetchProducts = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get<ProductProps[]>("/products?limit=20");
-      setProducts(res.data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch categories
-  const fetchCategories = async () => {
-    try {
-      const res = await api.get<Category[]>("/categories");
-      setCategories(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts();
-    fetchCategories();
-  }, []);
-
-  // Filtered products
-  const filteredProducts = products.filter((p) => {
-    const categoryMatch = selectedCategory ? Number(p.category.id) === selectedCategory : true;
-    const priceMatch = p.displayPrice >= priceRange[0] && p.displayPrice <= priceRange[1];
-    return categoryMatch && priceMatch;
+export default async function ProductsPage() {
+  // Fetch products with categories from Prisma
+  const productsData = await prisma.product.findMany({
+    include: { category: true },
   });
 
-  return (
-    <div className="flex flex-col md:flex-row p-6 gap-6">
-      {/* Sidebar Component */}
-      <Sidebar
-        categories={categories}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
-        priceRange={priceRange}
-        setPriceRange={setPriceRange}
-      />
+  const categoriesData = await prisma.category.findMany();
 
-      {/* Products Grid */}
-      <section className="flex-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-          <p>Loading products...</p>
-        ) : filteredProducts.length === 0 ? (
-          <p>No products found.</p>
-        ) : (
-          filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))
-        )}
-      </section>
-    </div>
-  );
+  // Transform Prisma data to match your TypeScript types
+  const products: ProductProps[] = productsData.map((p) => ({
+    id: p.id,
+    title: p.title,
+    slug: p.slug,
+    price: p.price,
+    displayPrice: p.displayPrice || p.price, // Use displayPrice if available, fallback to price
+    description: p.description,
+    category: p.category ? {
+      id: p.category.id,
+      name: p.category.name,
+      slug: p.category.slug,
+      image: p.category.image,
+      createdAt: p.category.createdAt.toISOString(),
+      updatedAt: p.category.updatedAt.toISOString(),
+    } : null, // Handle products without categories
+    images: p.images,
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+    priceId: p.priceId || "",
+    stripeProductId: p.stripeProductId,
+  }));
+
+  const categories: CategoryProps[] = categoriesData.map((c) => ({
+    id: c.id,
+    name: c.name,
+    slug: c.slug,
+    image: c.image,
+    createdAt: c.createdAt.toISOString(),
+    updatedAt: c.updatedAt.toISOString(),
+  }));
+
+  return <ProductsClient products={products} categories={categories} />;
 }

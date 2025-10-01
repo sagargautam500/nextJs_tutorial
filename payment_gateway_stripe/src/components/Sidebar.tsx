@@ -1,14 +1,14 @@
 "use client";
 
 interface Category {
-  id: number;
+  id: string; // Changed to match Prisma ObjectId
   name: string;
 }
 
 interface SidebarProps {
   categories: Category[];
-  selectedCategory: number | null;
-  setSelectedCategory: (id: number | null) => void;
+  selectedCategory: string | null; // Changed to string to match ObjectId
+  setSelectedCategory: (id: string | null) => void;
   priceRange: [number, number];
   setPriceRange: (range: [number, number]) => void;
 }

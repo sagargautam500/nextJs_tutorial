@@ -27,34 +27,44 @@ export default function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  const handleCheckout = async () => {
-    if (!product.priceId) {
-      alert("Invalid product price.");
-      return;
-    }
 
-    try {
-      setLoading(true);
-      const resp = await axios.post<{ url?: string; error?: string }>("/api/checkout", {
-        priceId: product.priceId,
-        quantity,
-      });
+const handleCheckout = async () => {
+  if (!product.priceId) {
+    alert("This product is not available for purchase. Please contact support.");
+    return;
+  }
 
-      if (resp.data?.url) {
-        window.location.href = resp.data.url;
-      } else if (resp.data?.error) {
-        alert("Checkout failed: " + resp.data.error);
-      } else {
-        alert("Unexpected checkout response");
+  try {
+    setLoading(true);
+    const resp = await axios.post<{ url?: string; error?: string; sessionId?: string }>(
+      "/api/checkout",
+      { priceId: product.priceId, quantity }
+    );
+
+    if (resp.data?.url) {
+      if (resp.data.sessionId) {
+        sessionStorage.setItem("checkout_session", resp.data.sessionId);
       }
-    } catch (error: unknown) {
-      const errMsg =
-        error instanceof Error ? error.message : "Unknown error occurred";
-      alert("Error during checkout: " + errMsg);
-    } finally {
-      setLoading(false);
+      window.location.href = resp.data.url;
+    } else if (resp.data?.error) {
+      alert(`Checkout failed: ${resp.data.error}`);
+    } else {
+      alert("Unable to process checkout. Please try again.");
     }
-  };
+  } catch (error: unknown) {
+    console.error("Checkout error:", error);
+
+    if (axios.isAxiosError(error)) {
+      const errorMessage = (error.response?.data as { error?: string })?.error || error.message;
+      alert(`Checkout failed: ${errorMessage}`);
+    } else {
+      const errMsg = error instanceof Error ? error.message : "An unexpected error occurred";
+      alert(`Error during checkout: ${errMsg}`);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleAddToCart = () => {
     alert(`Added ${quantity} × ${product.title} to cart`);
@@ -96,10 +106,17 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="truncate text-lg font-semibold text-gray-900">
           {product.title}
         </h3>
-        <p className="text-sm text-gray-500">{product.category.name}</p>
-        <p className="text-xl font-bold text-blue-600">
-          ${product.displayPrice}
-        </p>
+        <p className="text-sm text-gray-500">{product.category?.name || "Uncategorized"}</p>
+        <div className="flex items-center gap-2">
+          <p className="text-xl font-bold text-blue-600">
+            ${product.displayPrice}
+          </p>
+          {product.displayPrice !== product.price && (
+            <p className="text-sm text-gray-500 line-through">
+              ${product.price}
+            </p>
+          )}
+        </div>
         <p className="line-clamp-2 text-sm text-gray-600">
           {product.description}
         </p>

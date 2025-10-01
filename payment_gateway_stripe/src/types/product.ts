@@ -1,21 +1,28 @@
 // types/product.ts
 export interface CategoryProps {
-  id: number;
+  id: string; // Changed from number to string to match Prisma ObjectId
   name: string;
   slug: string;
-  image: string;
-  creationAt: string;
+  image: string | null;
+  createdAt: string; // Changed from creationAt to createdAt to match Prisma
   updatedAt: string;
 }
 
-// types/product.ts
 export interface ProductProps {
-  id: string;
+  id: string; // Changed from number to string to match Prisma ObjectId
   title: string;
+  slug: string;
+  price: number;
+  displayPrice: number;
   description: string;
-  category: { id: string; name: string };
+  category: CategoryProps | null; // Made optional to handle products without categories
   images: string[];
-  priceId: string;        // stripe Price ID (server-side verified)
-  displayPrice: number;   // human-readable price like 19.99
+  createdAt: string; // Changed from creationAt to createdAt to match Prisma
+  updatedAt: string;
+  priceId: string; // Stripe Price ID 
+  stripeProductId?: string | null;
 }
+
+
+
 
