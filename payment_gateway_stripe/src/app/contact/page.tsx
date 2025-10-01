@@ -18,8 +18,8 @@ export default function ContactPage() {
     
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    alert("Thank you for your message! We&apos;ll get back to you soon.");
+
+    alert("Thank you for your message! We will get back to you soon.");
     setFormData({ name: "", email: "", subject: "", message: "" });
     setIsSubmitting(false);
   };
@@ -37,7 +37,7 @@ export default function ContactPage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Contact Us</h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Have questions about our products or need support? We&apos;re here to help!
+            Have questions about our products or need support? We are here to help!
           </p>
         </div>
 

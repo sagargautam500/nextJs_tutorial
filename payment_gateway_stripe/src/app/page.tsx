@@ -45,7 +45,7 @@ export default async function HomePage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Secure Payments</h3>
               <p className="text-gray-600">
-                Powered by Stripe&apos;s industry-leading security standards and PCI compliance.
+                Powered by Stripe industry-leading security standards and PCI compliance.
               </p>
             </div>
             <div className="text-center p-6">
