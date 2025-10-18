@@ -194,7 +194,7 @@ export default function Navbar() {
 
             {/* Mobile Account */}
             <Link
-              href="#"
+              href="/account"
               onClick={() => setIsMenuOpen(false)}
               className="flex items-center space-x-3 px-4 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium mt-2"
             >
