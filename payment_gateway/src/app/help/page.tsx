@@ -863,7 +863,7 @@ NEXT_PUBLIC_CONNECTIPS_URL="https://payment.connectips.com:7443/connectipswebgw/
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="https://github.com/yourusername/yourrepo"
+              href="https://github.com/sagargautam500"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-gray-900 text-white px-8 py-4 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg flex items-center gap-2"
