@@ -2,6 +2,17 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+type OrderResponse = {
+  id: string;
+  amount: number;
+  currency: string;
+  email: string;
+  status: string;
+  paymentMethod: string | null;
+  createdAt: Date;
+  stripeCheckoutSession: string | null;
+  stripePaymentIntentId: string | null;
+};
 
 export async function GET(req: Request) {
   try {
@@ -40,7 +51,7 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({
-      orders: orders.map((order) => ({
+      orders: orders.map((order: OrderResponse) => ({
         ...order,
         createdAt: order.createdAt.toISOString(),
       })),
