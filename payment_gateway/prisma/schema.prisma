@@ -15,36 +15,32 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([email])
+  // ✅ Removed @@index([email]) because @unique already creates an index
 }
 
 model Order {
-  id                     String      @id @default(auto()) @map("_id") @db.ObjectId
-  user                   User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
-  userId                 String?     @db.ObjectId
-  email                  String
-  amount                 Int         // Amount in NPR (not paisa)
-  currency               String      @default("npr")
-  status                 String      @default("pending") // pending, paid, failed, expired, refunded
-  paymentMethod          String?     @default("card") // card, esewa, khalti, connectips
-  stripeCheckoutSession  String?     @unique
-  stripePaymentIntentId  String?     @unique
-  esewaRefId             String?     @unique
-  khaltiToken            String?     @unique
-  connectipsTransId      String?     @unique
-  items                  OrderItem[] // ✅ Relation to order items
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
+  id                    String      @id @default(auto()) @map("_id") @db.ObjectId
+  user                  User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userId                String?     @db.ObjectId
+  email                 String
+  amount                Int // Amount in NPR (not paisa)
+  currency              String      @default("npr")
+  status                String      @default("pending") // pending, paid, failed, expired, refunded
+  paymentMethod         String?     @default("card") // card, esewa, khalti, connectips
+  stripeCheckoutSession String?     @unique
+  stripePaymentIntentId String?     @unique
+  esewaRefId            String?     @unique
+  khaltiToken           String?     @unique
+  connectipsTransId     String?     @unique
+  items                 OrderItem[] // ✅ Relation to order items
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
 
+  // ✅ Keep only useful non-duplicate indexes
   @@index([userId])
   @@index([email])
   @@index([status])
   @@index([paymentMethod])
-  @@index([stripeCheckoutSession])
-  @@index([stripePaymentIntentId])
-  @@index([esewaRefId])
-  @@index([khaltiToken])
-  @@index([connectipsTransId])
   @@index([createdAt])
 }
 
@@ -52,10 +48,10 @@ model OrderItem {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId   String   @db.ObjectId
-  name      String   // Product name
-  price     Int      // Price per unit in NPR
-  quantity  Int      // Quantity purchased
-  image     String?  // Optional product image URL
+  name      String // Product name
+  price     Int // Price per unit in NPR
+  quantity  Int // Quantity purchased
+  image     String? // Optional product image URL
   createdAt DateTime @default(now())
 
   @@index([orderId])
