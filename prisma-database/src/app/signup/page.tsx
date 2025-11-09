@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // App Router
 
 export default function SignUpPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const router = useRouter();
@@ -15,7 +17,7 @@ export default function SignUpPage() {
     const res = await fetch('/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({name, email,address, password }),
     });
 
     const data = await res.json();
@@ -23,7 +25,9 @@ export default function SignUpPage() {
 
     if (res.ok) {
       // Clear form fields
+      setName('');
       setEmail('');
+      setAddress('');
       setPassword('');
 
       // Redirect to Sign In page after 1 second
@@ -42,10 +46,26 @@ export default function SignUpPage() {
         <h2 className="text-2xl font-semibold text-center">Sign Up</h2>
 
         <input
+          type="text"
+          placeholder="Full Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full border p-2 rounded"
+          required
+        />
+        <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full border p-2 rounded"
+          required
+        />
+        <input
+          type="text"
+          placeholder="Address"
+          value={address}
+          onChange={(e) => setAddress(e.target.value)}
           className="w-full border p-2 rounded"
           required
         />

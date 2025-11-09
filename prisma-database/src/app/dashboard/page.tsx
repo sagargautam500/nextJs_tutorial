@@ -1,8 +1,9 @@
 import { getUserData } from "@/lib/action/serverAction";
 interface User {
   id: number;
-  name: string;
+  name: string ;
   email: string;
+  address: string;
 }
 
 function UserCard({ user }: { user: User }) {
@@ -10,6 +11,7 @@ function UserCard({ user }: { user: User }) {
     <div className="border p-4 rounded-lg shadow-sm bg-gray-50">
       <h3 className="text-lg font-semibold">{user.name}</h3>
       <p className="text-gray-600">{user.email}</p>
+      <p className="text-gray-600">{user.address}</p>
       <div className="mt-2">
         <p className="text-sm text-gray-500">
           <span className="font-semibold">ID:</span> {user.id}
