@@ -14,6 +14,8 @@ A complete Next.js ecommerce application with **Stripe, eSewa, Khalti, and Conne
 - 🚀 **Production Ready** - Full error handling
 
 ---
+**local secert key generate and run locally**
+stripe listen --forward-to localhost:3000//webhook
 
 ## 📁 Project Structure
 
