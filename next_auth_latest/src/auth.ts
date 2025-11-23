@@ -91,25 +91,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     // Auto-create user on first OAuth login
     async signIn({ user, account }) {
       if (account?.provider !== "credentials" && user?.email) {
-        const existingUser = await prisma.user.findUnique({
+        let dbUser = await prisma.user.findUnique({
           where: { email: user.email },
         });
-
-      
-
-        // ✅ Auto-create user if not found
-        if (!existingUser) {
-          await prisma.user.create({
+    
+        // If new OAuth user → create in DB
+        if (!dbUser) {
+          dbUser = await prisma.user.create({
             data: {
               name: user.name ?? "No Name",
               email: user.email,
-              phone: "",
+              phone:"",
               password: "",
               role: "user",
             },
           });
         }
+    
+        // 👇 VERY IMPORTANT
+        // Attach the DB user ID so jwt() receives correct id
+        (user as any).id = dbUser.id;
+        (user as any).role = dbUser.role as "user" | "admin";
       }
+    
       return true;
     },
 
